@@ -29,3 +29,5 @@ This should start both apps.
 1. Register the command in the `CommandList.ts` in the commands folder. This is the list of commands that the Discord Bot will load on startup.
 
 **If you do not register the command, the Discord Bot will not load it.**
+
+TESTING
