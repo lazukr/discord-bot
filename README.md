@@ -13,12 +13,20 @@ This is an updated project to play around with Discord bots built using [`Eris`]
     ```
     yarn install
     ```
+1. Rename `./packages/discord-bot/src/config-sample.json` to `config.json` and configure it, check the Discord Configuration section
 1. Run
     ```
     yarn start
     ```
 
 This should start both apps.
+
+# Discord Configuration
+| config | default | notes |
+| - | - | - |
+| `token` | `""` | The discord bot client token. Do not ever reveal this.
+| `prefix` | `!` | The symbol prefix that the bot accepts to intepret a command.
+| `env` | `dev` | The environment that the applications are running in. For `dev`, it allows logging to show the console with colour codes. `prod` lacks the console with colour codes and only writes to log files.
 
 # Custom Commands
 1. Add new commands under the commands folder:
