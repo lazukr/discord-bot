@@ -12,6 +12,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "lerna run --parallel start"
+    "start": "lerna run --parallel start",
+    "test": "lerna run --parallel test"
   }
 }

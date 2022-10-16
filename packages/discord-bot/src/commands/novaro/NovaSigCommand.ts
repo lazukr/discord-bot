@@ -1,7 +1,7 @@
 import { Command } from "eris";
 import { Logger } from "../../Logger";
 import { DiscordBot } from "../../DiscordBot";
-import { randomInteger } from "../../utils/integerRandom";
+import { randomInteger } from "../../utils/randomInteger";
 
 const POSE_MAX = 12;
 const BG_MAX = 10;

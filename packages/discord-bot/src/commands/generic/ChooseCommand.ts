@@ -1,7 +1,7 @@
 import { Command } from "eris";
 import { Logger } from "../../Logger";
 import { DiscordBot } from "../../DiscordBot";
-import { randomInteger } from "../../utils/integerRandom";
+import { randomInteger } from "../../utils/randomInteger";
 
 export class ChooseCommand extends Command {
     constructor(client: DiscordBot) {
