@@ -12,8 +12,8 @@ describe("test parseSigArgs", () => {
     test("config only.", () => {
         const args = ["a/a"];
         const [name, config] = parseSigArgs(args);
-        expect(name).toBe("");
-        expect(config).toBe("a/a");
+        expect(name).toBe("a/a");
+        expect(config).toBe("");
     });
 
     test("name with space.", () => {
@@ -53,7 +53,6 @@ describe("test parseSigArgs", () => {
 });
 
 describe("test parseCharConfig", () => {
-
 
 
 });

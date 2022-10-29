@@ -1,7 +1,7 @@
 import { Command } from "eris";
 import { Logger } from "../../Logger";
 import { DiscordBot } from "../../DiscordBot";
-import { randomInteger } from "../../utils/randomInteger";
+import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
 
 export const POSE_MAX = 12;
 export const BG_MAX = 10;
@@ -34,6 +34,10 @@ export class NovaSigCommand extends Command {
 }
 
 export const parseSigArgs = (args: string[]): [string, string] => {
+    // if only one argument, it has to be name
+    if (args.length === 1) {
+        return [args[0], ""];
+    }
     const lastArg = args[args.length - 1];
     const match = lastArg!.match(configRegex);
     const config =  match ? lastArg : "";
@@ -41,13 +45,16 @@ export const parseSigArgs = (args: string[]): [string, string] => {
     return [name, config];
 };
 
-export const parseCharConfig = (config: string): [number, number] => {
+export const parseCharConfig = (
+    config: string,
+    randomNumGenerator: RandomIntegerGenerator = randomInteger
+    ): [number, number] => {
     // empty string or null or undefined
     if (!config) {
         // return two random numbers as results
         return [
-            randomInteger(0, BG_MAX + 1),
-            randomInteger(0, POSE_MAX + 1),
+            randomNumGenerator(0, BG_MAX + 1),
+            randomNumGenerator(0, POSE_MAX + 1),
         ];
     }
 
@@ -59,7 +66,7 @@ export const parseCharConfig = (config: string): [number, number] => {
     // returns the background and pose
     // if NaN, choose a random number instead
     return [
-        isNaN(bg) ? randomInteger(0, BG_MAX + 1) : bg,
-        isNaN(pose) ? randomInteger(0, POSE_MAX + 1) : pose,
+        isNaN(bg) ? randomNumGenerator(0, BG_MAX + 1) : bg,
+        isNaN(pose) ? randomNumGenerator(0, POSE_MAX + 1) : pose,
     ];
 };
