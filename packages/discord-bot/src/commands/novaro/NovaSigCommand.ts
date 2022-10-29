@@ -2,6 +2,7 @@ import { Command } from "eris";
 import { Logger } from "../../Logger";
 import { DiscordBot } from "../../DiscordBot";
 import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
+import { inRange } from "../../utils/inRange";
 
 export const POSE_MAX = 12;
 export const BG_MAX = 10;
@@ -66,7 +67,11 @@ export const parseCharConfig = (
     // returns the background and pose
     // if NaN, choose a random number instead
     return [
-        isNaN(bg) ? randomNumGenerator(0, BG_MAX + 1) : bg,
-        isNaN(pose) ? randomNumGenerator(0, POSE_MAX + 1) : pose,
+        isNaN(bg) || notInRange(bg, BG_MAX) ? randomNumGenerator(0, BG_MAX + 1) : bg,
+        isNaN(pose) || notInRange(pose, POSE_MAX) ? randomNumGenerator(0, POSE_MAX + 1) : pose,
     ];
+};
+
+const notInRange = (value: number, max: number) => {
+    return inRange(value, max) === false;
 };

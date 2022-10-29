@@ -53,6 +53,44 @@ describe("test parseSigArgs", () => {
 });
 
 describe("test parseCharConfig", () => {
+    test("config is empty.", () => {
+        const config = "";
+        const result = parseCharConfig(config);
+        result.every(e => expect(e).toEqual(expect.any(Number)));
+    });
 
+    test("config is #/.", () => {
+        const config = "5/";
+        const result = parseCharConfig(config);
+        expect(result[0]).toBe(5);
+        expect(result[1]).toEqual(expect.any(Number));
+    });
 
+    test("config is /#.", () => {
+        const config = "/6";
+        const result = parseCharConfig(config);
+        expect(result[0]).toEqual(expect.any(Number));
+        expect(result[1]).toBe(6);
+    });
+
+    test("config is /.", () => {
+        const config = "/";
+        const result = parseCharConfig(config);
+        expect(result[0]).toEqual(expect.any(Number));
+        expect(result[1]).toEqual(expect.any(Number));
+    });
+
+    test("config bg is over the limits.", () => {
+        const config = `${BG_MAX + 1}/5`;
+        const result = parseCharConfig(config);
+        expect(result[0]).toBeLessThanOrEqual(BG_MAX);
+        expect(result[0]).toBeGreaterThanOrEqual(0);
+    });
+
+    test("config pose is over the limits.", () => {
+        const config = `5/${POSE_MAX + 1}`;
+        const result = parseCharConfig(config);
+        expect(result[1]).toBeLessThanOrEqual(POSE_MAX);
+        expect(result[1]).toBeGreaterThanOrEqual(0);
+    });
 });
