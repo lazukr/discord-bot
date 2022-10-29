@@ -4,7 +4,7 @@ import DailyRotate from "winston-daily-rotate-file";
 import { Environment } from "./configuration/Environment";
 
 export class Logger {
-    private static instance : Logger = new Logger();
+    private static _instance : Logger = new Logger();
     private logger: Winston.Logger = Winston.createLogger({
         level: "info",
         format: Winston.format.json(),
@@ -25,10 +25,10 @@ export class Logger {
     });
 
     constructor() {
-        if (Logger.instance) {
+        if (Logger._instance) {
             throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
         }
-        Logger.instance = this;
+        Logger._instance = this;
         const env = Config as Environment;
 
         if (env.env !== "prod") {
@@ -45,19 +45,19 @@ export class Logger {
         }
     }
 
-    public static getInstance() : Logger {
-        return Logger.instance;
+    private static get Instance() : Logger {
+        return Logger._instance;
     }
 
     public static log(message: string) {
-        Logger.getInstance().logger.info(message);
+        Logger.Instance.logger.info(message);
     }
 
     public static warn(message: string) {
-        Logger.getInstance().logger.warn(message);
+        Logger.Instance.logger.warn(message);
     }
 
     public static error(message: string) {
-        Logger.getInstance().logger.error(message);
+        Logger.Instance.logger.error(message);
     }
 }
