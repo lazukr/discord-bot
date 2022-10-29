@@ -21,6 +21,6 @@
   },
   "scripts": {
     "start": "ts-node ./src/Index.ts",
-    "test": "jest --maxWorkers=1"
+    "test": "jest --maxWorkers=1 --verbose"
   }
 }
