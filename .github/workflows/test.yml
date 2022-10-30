@@ -30,7 +30,7 @@ jobs:
       uses: jsdaniell/create-json@v1.2.1
       with:
         name: "config.json"
-        json: '{"token":${{ secrets.TOKEN }}, "prefix": ${{ secrets.PREFIX }}, "env": ${{ secrets.ENV }}}'
+        json: '{"token":"${{ secrets.TOKEN }}", "prefix": "${{ secrets.PREFIX }}", "env": "${{ secrets.ENV }}}"'
         dir: packages/discord-bot/src/
     - name: Run Tests
       run: yarn test
