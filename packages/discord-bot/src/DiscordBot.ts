@@ -1,6 +1,6 @@
 import Eris from "eris";
 import { Logger } from "./Logger";
-import { BotConfig } from "./configuration/BotConfig";
+import { BotConfig } from "./configuration/Config";
 import { CommandList } from "./commands/CommandList";
 
 export class DiscordBot extends Eris.CommandClient {    
