@@ -25,5 +25,7 @@ jobs:
         cache: 'yarn'
     - name: Install Dependencies
       run: yarn --frozen-lockfile
+    - name: Set NODE_ENV
+      run: export NODE_ENV=development
     - name: Run Tests
       run: yarn test

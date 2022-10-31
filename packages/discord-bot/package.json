@@ -23,6 +23,6 @@
   },
   "scripts": {
     "start": "ts-node ./src/Index.ts",
-    "test": "NODE_ENV=test jest --maxWorkers=1 --verbose"
+    "test": "jest --maxWorkers=1 --verbose"
   }
 }
