@@ -1,37 +1,40 @@
 import Winston, { format } from "winston";
-import Config from "./config.json";
 import DailyRotate from "winston-daily-rotate-file";
-import { Environment } from "./configuration/Environment";
+import { config } from "./configuration/Config";
 
 export class Logger {
     private static _instance : Logger = new Logger();
-    private logger: Winston.Logger = Winston.createLogger({
-        level: "info",
-        format: Winston.format.json(),
-        transports: [
-            new Winston.transports.File({
+    private logger: Winston.Logger;
+    constructor() {
+        if (Logger._instance) {
+            throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
+        }
+
+        this.logger = Winston.createLogger({
+            level: "info",
+            format: Winston.format.json(),
+            transports: [],
+        });
+
+        if (config.logToError) {
+            this.logger.transports.push(new Winston.transports.File({
                 filename: "errors.log",
                 level: "error",
                 dirname: "./logs/",
-            }),
-            new DailyRotate({
+            }));
+        }
+
+        if (config.logToFile) {
+            this.logger.add(new DailyRotate({
                 level: "info",
                 filename: "%DATE%.log",
                 datePattern: "YYYY-MM-DD",
                 maxFiles: "14d",
                 dirname: "./logs/",
-            }),
-        ],
-    });
-
-    constructor() {
-        if (Logger._instance) {
-            throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
+            }));
         }
-        Logger._instance = this;
-        const env = Config as Environment;
-
-        if (env.env !== "prod") {
+        
+        if (config.logToConsole) {
             this.logger.add(new Winston.transports.Console({
                 format: format.combine(
                     format.colorize(),
@@ -43,6 +46,8 @@ export class Logger {
                 ),
             }));
         }
+ 
+        Logger._instance = this;
     }
 
     private static get Instance() : Logger {
