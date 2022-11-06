@@ -1,38 +1,45 @@
-import { Command } from "eris";
+import axios from "axios";
 import { Logger } from "../../Logger";
-import { DiscordBot } from "../../DiscordBot";
 import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
 import { inRange } from "../../utils/inRange";
+import { CharGenOptions, CharGenRequest } from "../../dto/charGenRequest";
+import { RegisterableCommand } from "../RegisterableCommand";
 
 export const POSE_MAX = 12;
 export const BG_MAX = 10;
 
 const configRegex = /(\d*)\/(\d*)/;
-export class NovaSigCommand extends Command {
-    constructor(client: DiscordBot) {
-        super("novasig", (msg, args) => {
-            Logger.log(`NovaSig Command ran from ${msg.author} with args: ${args}`);
 
-            if (args.length === 0) {
-                return;
-            }
+export const NovaSigCommand: RegisterableCommand = {
+    name: "novasig",
+    command: async (msg, args) => {
+        Logger.log(`NovaSig Command ran from ${msg.author} with args: ${args}`);
+            
+        if (args.length === 0) {
+            return "no args";
+        }
 
-            const [name, config] = parseSigArgs(args);
+        const [name, config] = parseSigArgs(args);
 
-            if (name === null) {
-                // handle this
-            }
+        if (name === null) {
+            // handle this
+            return "name is null";
+        }
 
-            const [bg, pose] = parseCharConfig(config);
-            Logger.log(`NovaSig name: ${name}, bg: ${bg}, pose: ${pose}`);
-        }, {
-            description: "Gets the signature of a character from NovaRO.",
-            fullDescription: "Gets the signature of a character from NovaRO.",
-            aliases: ["sig"],
-            usage: "!sig <character name>",
-        });
-    }    
-}
+        const [bg, pose] = parseCharConfig(config);
+        Logger.log(`NovaSig name: ${name}, bg: ${bg}, pose: ${pose}`);
+
+        return {
+            content: "test"
+        };
+    },
+    options: {
+        description: "Gets the signature of a character from NovaRO.",
+        fullDescription: "Gets the signature of a character from NovaRO.",
+        aliases: ["sig"],
+        usage: "!sig <character name>",
+    }
+};
 
 export const parseSigArgs = (args: string[]): [string, string] => {
     // if only one argument, it has to be name

@@ -47,16 +47,10 @@ export class DiscordBot extends Eris.CommandClient {
 
     loadCommands() {
         Logger.log(`Registering ${CommandList.length} command(s)...`);
-        for (const Command of CommandList) {
-            const cmd = new Command(this);
-            Logger.log(`Registering "${cmd.label}" command...`);
-            const registeredCommand = this.registerCommand(cmd.label, (msg, args) => {
-                cmd.executeCommand(msg, args);
-            }, {
-                description: cmd.description,
-                aliases: cmd.aliases,
-            });
-            Logger.log(`Registered "${cmd.label}" successfully!`);
+        for (const command of CommandList) {
+            Logger.log(`Registering "${command.name}" command...`);
+            const registeredCommand = this.registerCommand(command.name, command.command, command.options);
+            Logger.log(`Registered "${command.name}" successfully!`);
         }
     }
 
