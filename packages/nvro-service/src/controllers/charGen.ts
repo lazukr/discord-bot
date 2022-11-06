@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import axios from "axios";
 import { CharGenRequest, GetCharGen } from "../dto/CharGenRequest";
-
-
 const link = "https://www.novaragnarok.com/ROChargenPHP";
 
 export const getCharGenLink = async (req: Request, res: Response) => {

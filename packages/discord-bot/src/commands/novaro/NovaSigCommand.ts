@@ -29,6 +29,16 @@ export const NovaSigCommand: RegisterableCommand = {
         const [bg, pose] = parseCharConfig(config);
         Logger.log(`NovaSig name: ${name}, bg: ${bg}, pose: ${pose}`);
 
+        const charGenRequest: CharGenRequest = {
+            name: name,
+            first: bg,
+            second: pose,
+            mode: CharGenOptions.Sig
+        };
+        
+        const res = await axios.post("/chargen", charGenRequest);
+        console.log(res.data);
+
         return {
             content: "test"
         };
