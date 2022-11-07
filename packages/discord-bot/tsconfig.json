@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-      "target": "ES6",
-      "module": "Node16",
+      "target": "ES2022",
       "strict": true,
       "sourceMap": true,
       "esModuleInterop": true,
