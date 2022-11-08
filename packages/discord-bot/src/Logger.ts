@@ -17,7 +17,7 @@ export class Logger {
         });
 
         if (config.logToError) {
-            this.logger.transports.push(new Winston.transports.File({
+            this.logger.add(new Winston.transports.File({
                 filename: "errors.log",
                 level: "error",
                 dirname: "./logs/",

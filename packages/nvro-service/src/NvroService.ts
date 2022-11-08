@@ -9,6 +9,6 @@ export class NvroService {
             console.log("server listening on 3000...");
         });
         this.app.use(Express.json());
-        this.app.use("/chargen", getCharGenLink);
+        this.app.use("/chargen", Express.raw(), getCharGenLink);
     }
 }
