@@ -35,12 +35,16 @@ export const NovaSigCommand: RegisterableCommand = {
         try {
             
             const res = await axios.post("/chargen", charGenRequest);
-            const image = Buffer.from(res.data, "base64");
-            const file: FileContent = {
-                file: image,
-                name: `${name}.png`
+            const result = await axios.get(res.data, {
+                responseType: "arraybuffer"
+            });
+            
+            const image = {
+                file: result.data,
+                name: `${name}.png`,
             };
-            msg.channel.createMessage("", file);
+            msg.channel.createMessage("", image);
+            
         } catch (ex) {
             if (ex instanceof(AxiosError)) {
                 const exception = ex as AxiosError;
