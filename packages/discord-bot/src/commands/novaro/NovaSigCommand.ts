@@ -1,9 +1,10 @@
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import { Logger } from "../../Logger";
 import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
 import { inRange } from "../../utils/inRange";
 import { CharGenOptions, CharGenRequest } from "../../dto/charGenRequest";
 import { RegisterableCommand } from "../RegisterableCommand";
+import { FileContent } from "eris";
 
 export const POSE_MAX = 12;
 export const BG_MAX = 10;
@@ -14,16 +15,11 @@ export const NovaSigCommand: RegisterableCommand = {
     name: "novasig",
     command: async (msg, args) => {
         Logger.log(`NovaSig Command ran from ${msg.author} with args: ${args}`);
-            
-        if (args.length === 0) {
-            return "no args";
-        }
-
         const [name, config] = parseSigArgs(args);
 
         if (name === null) {
-            // handle this
-            return "name is null";
+            msg.channel.createMessage("Name is invalid.");
+            return;
         }
 
         const [bg, pose] = parseCharConfig(config);
@@ -35,19 +31,35 @@ export const NovaSigCommand: RegisterableCommand = {
             second: pose,
             mode: CharGenOptions.Sig
         };
-        
-        const res = await axios.post("/chargen", charGenRequest);
-        console.log(res.data);
 
-        return {
-            content: "test"
-        };
+        try {
+            
+            const res = await axios.post("/chargen", charGenRequest);
+            const result = await axios.get(res.data, {
+                responseType: "arraybuffer"
+            });
+            
+            const image = {
+                file: result.data,
+                name: `${name}.png`,
+            };
+            msg.channel.createMessage("", image);
+            
+        } catch (ex) {
+            if (ex instanceof(AxiosError)) {
+                const exception = ex as AxiosError;
+                Logger.error(exception.message);
+            }
+            msg.channel.createMessage("Something went wrong.");
+        }
     },
     options: {
         description: "Gets the signature of a character from NovaRO.",
         fullDescription: "Gets the signature of a character from NovaRO.",
         aliases: ["sig"],
-        usage: "!sig <character name>",
+        usage: "`!sig <character name> <pose#>/<bg#>`",
+        argsRequired: true,
+        invalidUsageMessage: "`Requires at least one argument.`",
     }
 };
 
