@@ -1,11 +1,8 @@
-export enum CharGenOptions {
-    Char,
-    Sig,
-};
+import { CharGenOption } from "./charGenOption";
 
 export interface CharGenRequest {
     name: string;
-    mode: CharGenOptions;
+    mode: CharGenOption;
     first: number;
     second: number;
 }

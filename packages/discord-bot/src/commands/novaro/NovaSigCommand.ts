@@ -2,9 +2,11 @@ import axios, { Axios, AxiosError } from "axios";
 import { Logger } from "../../Logger";
 import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
 import { inRange } from "../../utils/inRange";
-import { CharGenOptions, CharGenRequest } from "../../dto/charGenRequest";
+import { getCharGenLink } from "./utils/charGen";
 import { RegisterableCommand } from "../RegisterableCommand";
 import { FileContent } from "eris";
+import { CharGenRequest } from "./utils/charGenRequest";
+import { CharGenOption } from "./utils/charGenOption";
 
 export const POSE_MAX = 12;
 export const BG_MAX = 10;
@@ -29,22 +31,21 @@ export const NovaSigCommand: RegisterableCommand = {
             name: name,
             first: bg,
             second: pose,
-            mode: CharGenOptions.Sig
+            mode: CharGenOption.Sig
         };
 
+        const link = getCharGenLink(charGenRequest);
+        Logger.log(`Novasig link: ${link}`);
+
         try {
-            
-            const res = await axios.post("/chargen", charGenRequest);
-            const result = await axios.get(res.data, {
+            const result = await axios.get(link, {
                 responseType: "arraybuffer"
             });
-            
             const image = {
                 file: result.data,
                 name: `${name}.png`,
             };
             msg.channel.createMessage("", image);
-            
         } catch (ex) {
             if (ex instanceof(AxiosError)) {
                 const exception = ex as AxiosError;
