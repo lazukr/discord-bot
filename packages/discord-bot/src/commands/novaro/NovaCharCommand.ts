@@ -8,7 +8,7 @@ import { parseCharConfig, parseSigArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } fro
 
 const COMMAND_NAME = "novachar";
 
-export const NovaSigCommand: RegisterableCommand = {
+export const NovaCharCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
         Logger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
