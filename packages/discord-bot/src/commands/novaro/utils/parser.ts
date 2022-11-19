@@ -9,7 +9,7 @@ export const CHAR_ROTATION_MAX = 7;
 
 const configRegex = /(\d*)\/(\d*)/;
 
-export const parseSigArgs = (args: string[]): [string, string] => {
+export const parseCharGenArgs = (args: string[]): [string, string] => {
     // if only one argument, it has to be name
     if (args.length === 1) {
         return [args[0], ""];
@@ -21,7 +21,7 @@ export const parseSigArgs = (args: string[]): [string, string] => {
     return [name, config];
 };
 
-export const parseCharConfig = (
+export const parseCharGenConfig = (
     config: string,
     firstArgMax: number,
     secondArgMax: number,

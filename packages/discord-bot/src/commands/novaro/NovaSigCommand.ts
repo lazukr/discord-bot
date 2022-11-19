@@ -4,7 +4,7 @@ import { getCharGenLink } from "./utils/charGen";
 import { RegisterableCommand } from "../RegisterableCommand";
 import { CharGenRequest } from "./utils/charGenRequest";
 import { CharGenOption } from "./utils/charGenOption";
-import { parseCharConfig, parseSigArgs, SIG_BG_MAX, SIG_POSE_MAX } from "./utils/parser";
+import { parseCharGenConfig, parseCharGenArgs, SIG_BG_MAX, SIG_POSE_MAX } from "./utils/parser";
 
 const COMMAND_NAME = "novasig";
 
@@ -12,14 +12,14 @@ export const NovaSigCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
         Logger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
-        const [name, config] = parseSigArgs(args);
+        const [name, config] = parseCharGenArgs(args);
 
         if (name === null) {
             msg.channel.createMessage("Name is invalid.");
             return;
         }
 
-        const [bg, pose] = parseCharConfig(config, SIG_BG_MAX, SIG_POSE_MAX);
+        const [bg, pose] = parseCharGenConfig(config, SIG_BG_MAX, SIG_POSE_MAX);
         Logger.log(`${COMMAND_NAME} name: ${name}, bg: ${bg}, pose: ${pose}`);
 
         const charGenRequest: CharGenRequest = {

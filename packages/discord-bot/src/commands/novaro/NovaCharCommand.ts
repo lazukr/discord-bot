@@ -4,7 +4,7 @@ import { getCharGenLink } from "./utils/charGen";
 import { RegisterableCommand } from "../RegisterableCommand";
 import { CharGenRequest } from "./utils/charGenRequest";
 import { CharGenOption } from "./utils/charGenOption";
-import { parseCharConfig, parseSigArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser";
+import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser";
 
 const COMMAND_NAME = "novachar";
 
@@ -12,21 +12,21 @@ export const NovaCharCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
         Logger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
-        const [name, config] = parseSigArgs(args);
+        const [name, config] = parseCharGenArgs(args);
 
         if (name === null) {
             msg.channel.createMessage("Name is invalid.");
             return;
         }
 
-        const [action, rotation] = parseCharConfig(config, CHAR_ACTION_MAX, CHAR_ROTATION_MAX);
+        const [action, rotation] = parseCharGenConfig(config, CHAR_ACTION_MAX, CHAR_ROTATION_MAX);
         Logger.log(`${COMMAND_NAME} name: ${name}, bg: ${action}, pose: ${rotation}`);
 
         const charGenRequest: CharGenRequest = {
             name: name,
             first: action,
             second: rotation,
-            mode: CharGenOption.Sig
+            mode: CharGenOption.Char
         };
 
         const link = getCharGenLink(charGenRequest);
