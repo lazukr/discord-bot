@@ -1,7 +1,7 @@
 import { CharGenOption } from "./charGenOption";
 import { CharGenRequest } from "./charGenRequest";
 
-const LINK = "https://www.novaragnarok.com/ROChargenPHP";
+export const CHARGEN_LINK = "https://www.novaragnarok.com/ROChargenPHP";
 const getCharGen = (option: CharGenOption) : "character" | "newsig" => {
     return option === CharGenOption.Char ? "character" : "newsig";
 };
@@ -13,5 +13,5 @@ export const getCharGenLink = (request: CharGenRequest) => {
         second,
         name,
     } = request;
-    return `${LINK}/${getCharGen(mode)}/${name}/${first}/${second}?${Date.now()}`;
+    return `${CHARGEN_LINK}/${getCharGen(mode)}/${name}/${first}/${second}?${Date.now()}`;
 };
