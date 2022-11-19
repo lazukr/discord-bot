@@ -2,6 +2,8 @@ import { Logger } from "../../Logger";
 import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
 import { RegisterableCommand } from "../RegisterableCommand";
 
+const COMMAND_NAME = "choose";
+
 export const choose = (
     args: string[], 
     randomNumGenerator: RandomIntegerGenerator = randomInteger) => {
@@ -20,9 +22,9 @@ export const choose = (
 };
 
 export const ChooseCommand: RegisterableCommand = {
-    name: "choose",
+    name: COMMAND_NAME,
     command: (msg, args) => {
-        Logger.log(`Choose command from ${msg.author} with args: ${args.join("")}`);
+        Logger.log(`Command [${COMMAND_NAME}] from ${msg.author} with args: ${args.join("")}`);
         const result = choose(args);
         return `\`${result}\``;
     },

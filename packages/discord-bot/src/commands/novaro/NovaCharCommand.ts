@@ -4,11 +4,11 @@ import { getCharGenLink } from "./utils/charGen";
 import { RegisterableCommand } from "../RegisterableCommand";
 import { CharGenRequest } from "./utils/charGenRequest";
 import { CharGenOption } from "./utils/charGenOption";
-import { parseCharGenConfig, parseCharGenArgs, SIG_BG_MAX, SIG_POSE_MAX } from "./utils/parser";
+import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser";
 
-const COMMAND_NAME = "novasig";
+const COMMAND_NAME = "novachar";
 
-export const NovaSigCommand: RegisterableCommand = {
+export const NovaCharCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
         Logger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
@@ -19,14 +19,14 @@ export const NovaSigCommand: RegisterableCommand = {
             return;
         }
 
-        const [bg, pose] = parseCharGenConfig(config, SIG_BG_MAX, SIG_POSE_MAX);
-        Logger.log(`${COMMAND_NAME} name: ${name}, bg: ${bg}, pose: ${pose}`);
+        const [action, rotation] = parseCharGenConfig(config, CHAR_ACTION_MAX, CHAR_ROTATION_MAX);
+        Logger.log(`${COMMAND_NAME} name: ${name}, bg: ${action}, pose: ${rotation}`);
 
         const charGenRequest: CharGenRequest = {
             name: name,
-            first: bg,
-            second: pose,
-            mode: CharGenOption.Sig
+            first: action,
+            second: rotation,
+            mode: CharGenOption.Char
         };
 
         const link = getCharGenLink(charGenRequest);
@@ -49,10 +49,10 @@ export const NovaSigCommand: RegisterableCommand = {
         }
     },
     options: {
-        description: "Gets the signature of a character from NovaRO.",
-        fullDescription: "Gets the signature of a character from NovaRO.",
-        aliases: ["sig"],
-        usage: `\`!sig <character name> <bg# (0-${SIG_BG_MAX})>/<pose# (0-${SIG_POSE_MAX})>\``,
+        description: "Gets a character from NovaRO.",
+        fullDescription: "Gets a character from NovaRO.",
+        aliases: ["char"],
+        usage: `\`!char <character name> <action# (0-${CHAR_ACTION_MAX})>/<rotation# (0-${CHAR_ROTATION_MAX})>\``,
         argsRequired: true,
         invalidUsageMessage: "`Requires at least one argument.`",
     }
