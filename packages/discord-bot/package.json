@@ -32,7 +32,7 @@
   "scripts": {
     "dev": "ts-node-esm ./src/Index.ts",
     "start": "node ./dist/src/Index.js",
-    "test": "jest --maxWorkers=1 --verbose",
+    "test": "jest",
     "build": "rm -rf ./dist && tsc --build",
     "link": "yarn link @lazukr/common",
     "cir-check": "madge --circular --extensions ts ./"
