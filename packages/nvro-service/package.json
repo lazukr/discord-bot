@@ -22,6 +22,6 @@
     "dev": "ts-node-esm ./src/index.ts",
     "start": "node ./dist/src/index.js",
     "build": "rm -rf ./dist && tsc --build",
-    "link": "yarn link @lazukr/common"
+    "common-link": "yarn link @lazukr/common"
   }
 }
