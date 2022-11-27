@@ -1,5 +1,5 @@
 import { expect, test, jest } from "@jest/globals";
-import { inRange } from "./inRange";
+import { inRange } from "./inRange.js";
 
 test("value within range.", () => {
     const max = 10;

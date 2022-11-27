@@ -1,9 +1,9 @@
-import Eris from "eris";
-import { Logger } from "./Logger";
-import { BotConfig } from "./configuration/Config";
-import { CommandList } from "./commands/CommandList";
+import { CommandClient, Constants } from "eris";
+import { BotLogger } from "./BotLogger.js";
+import { BotConfig } from "./configuration/Config.js";
+import { CommandList } from "./commands/CommandList.js";
 
-export class DiscordBot extends Eris.CommandClient {    
+export class DiscordBot extends CommandClient {    
     constructor(config: BotConfig) {
         if (!config) {
             throw new TypeError("config cannot be empty or null.");
@@ -17,8 +17,8 @@ export class DiscordBot extends Eris.CommandClient {
         const prefix = config.prefix ?? "!";
         super(token, {
             intents: [
-                Eris.Constants.Intents.guilds,
-                Eris.Constants.Intents.guildMessages,
+                Constants.Intents.guilds,
+                Constants.Intents.guildMessages,
             ],
         }, {
             prefix: prefix,
@@ -29,28 +29,28 @@ export class DiscordBot extends Eris.CommandClient {
 
     attachListeners() {
         this.on("ready", () => {
-            Logger.log("ready!");
+            BotLogger.log("ready!");
         });
 
         this.on("connect", () => {
-            Logger.log("connected!");
+            BotLogger.log("connected!");
         });
 
         this.on("disconnect", () => {
-            Logger.warn("disconnected!");
+            BotLogger.warn("disconnected!");
         });
 
         this.on("error", (error) => {
-            Logger.error(error.message);
+            BotLogger.error(error.message);
         });
     }
 
     loadCommands() {
-        Logger.log(`Registering ${CommandList.length} command(s)...`);
+        BotLogger.log(`Registering ${CommandList.length} command(s)...`);
         for (const command of CommandList) {
-            Logger.log(`Registering "${command.name}" command...`);
+            BotLogger.log(`Registering "${command.name}" command...`);
             const registeredCommand = this.registerCommand(command.name, command.command, command.options);
-            Logger.log(`Registered "${command.name}" successfully!`);
+            BotLogger.log(`Registered "${command.name}" successfully!`);
         }
     }
 

@@ -1,8 +1,7 @@
-import { DiscordBot } from "./DiscordBot";
-import { config } from "./configuration/Config";
-import { serviceConfig } from "./configuration/ServiceConfig";
+import { DiscordBot } from "./DiscordBot.js";
+import { config } from "./configuration/Config.js";
 import axios from "axios";
 
-axios.defaults.baseURL = serviceConfig.url;
+axios.defaults.baseURL = config.url;
 const bot = new DiscordBot(config);
 bot.start();

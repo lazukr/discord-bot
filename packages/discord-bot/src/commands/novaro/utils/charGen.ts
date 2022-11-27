@@ -1,5 +1,5 @@
-import { CharGenOption } from "./charGenOption";
-import { CharGenRequest } from "./charGenRequest";
+import { CharGenOption } from "./charGenOption.js";
+import { CharGenRequest } from "./charGenRequest.js";
 
 export const CHARGEN_LINK = "https://www.novaragnarok.com/ROChargenPHP";
 const getCharGen = (option: CharGenOption) : "character" | "newsig" => {

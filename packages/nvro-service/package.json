@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "express": "^4.18.2",
     "got": "^12.5.2"
@@ -18,6 +19,9 @@
     "typescript": "^4.8.4"
   },
   "scripts": {
-    "start": "ts-node ./src/Index.ts"
+    "dev": "ts-node-esm ./src/index.ts",
+    "start": "node ./dist/src/index.js",
+    "build": "rm -rf ./dist && tsc --build",
+    "link": "yarn link @lazukr/common"
   }
 }

@@ -1,17 +1,17 @@
 import axios, { AxiosError } from "axios";
-import { Logger } from "../../Logger";
-import { getCharGenLink } from "./utils/charGen";
-import { RegisterableCommand } from "../RegisterableCommand";
-import { CharGenRequest } from "./utils/charGenRequest";
-import { CharGenOption } from "./utils/charGenOption";
-import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser";
+import { BotLogger } from "../../BotLogger.js";
+import { getCharGenLink } from "./utils/charGen.js";
+import { RegisterableCommand } from "../RegisterableCommand.js";
+import { CharGenRequest } from "./utils/charGenRequest.js";
+import { CharGenOption } from "./utils/charGenOption.js";
+import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser.js";
 
 const COMMAND_NAME = "novachar";
 
 export const NovaCharCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
-        Logger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
+        BotLogger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
         const [name, config] = parseCharGenArgs(args);
 
         if (name === null) {
@@ -20,7 +20,7 @@ export const NovaCharCommand: RegisterableCommand = {
         }
 
         const [action, rotation] = parseCharGenConfig(config, CHAR_ACTION_MAX, CHAR_ROTATION_MAX);
-        Logger.log(`${COMMAND_NAME} name: ${name}, bg: ${action}, pose: ${rotation}`);
+        BotLogger.log(`${COMMAND_NAME} name: ${name}, bg: ${action}, pose: ${rotation}`);
 
         const charGenRequest: CharGenRequest = {
             name: name,
@@ -30,7 +30,7 @@ export const NovaCharCommand: RegisterableCommand = {
         };
 
         const link = getCharGenLink(charGenRequest);
-        Logger.log(`${COMMAND_NAME} link: ${link}`);
+        BotLogger.log(`${COMMAND_NAME} link: ${link}`);
 
         try {
             const result = await axios.get(link, {
@@ -44,7 +44,7 @@ export const NovaCharCommand: RegisterableCommand = {
         } catch (ex) {
             if (ex instanceof(AxiosError)) {
                 const exception = ex as AxiosError;
-                Logger.error(exception.message);
+                BotLogger.error(exception.message);
             }
         }
     },

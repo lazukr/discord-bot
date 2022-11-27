@@ -1,5 +1,5 @@
 import { expect, test, describe } from "@jest/globals";
-import { parseCharGenArgs, parseCharGenConfig, SIG_BG_MAX, SIG_POSE_MAX } from "./parser";
+import { parseCharGenArgs, parseCharGenConfig, SIG_BG_MAX, SIG_POSE_MAX } from "./parser.js";
 
 describe("test parseSigArgs", () => {
     test("name only.", () => {

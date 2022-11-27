@@ -1,5 +1,5 @@
-import { inRange } from "../../../utils/inRange";
-import { randomInteger, RandomIntegerGenerator } from "../../../utils/randomInteger";
+import { inRange } from "../../../utils/inRange.js";
+import { randomInteger, RandomIntegerGenerator } from "../../../utils/randomInteger.js";
 
 export const SIG_POSE_MAX = 12;
 export const SIG_BG_MAX = 10;

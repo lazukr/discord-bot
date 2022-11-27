@@ -1,15 +1,11 @@
 import Winston, { format } from "winston";
 import DailyRotate from "winston-daily-rotate-file";
-import { config } from "./configuration/Config";
+import { Logger } from "./Logger.js";
+import { LoggerConfig } from "./LoggerConfig.js";
 
-export class Logger {
-    private static _instance : Logger = new Logger();
+export class WinstonLogger implements Logger {
     private logger: Winston.Logger;
-    constructor() {
-        if (Logger._instance) {
-            throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
-        }
-
+    constructor(config: LoggerConfig) {
         this.logger = Winston.createLogger({
             level: "info",
             format: Winston.format.json(),
@@ -46,23 +42,17 @@ export class Logger {
                 ),
             }));
         }
- 
-        Logger._instance = this;
     }
 
-    private static get Instance() : Logger {
-        return Logger._instance;
+    public log(message: string) {
+        this.logger.info(message);
     }
 
-    public static log(message: string) {
-        Logger.Instance.logger.info(message);
+    public warn(message: string) {
+        this.logger.warn(message);
     }
 
-    public static warn(message: string) {
-        Logger.Instance.logger.warn(message);
-    }
-
-    public static error(message: string) {
-        Logger.Instance.logger.error(message);
+    public error(message: string) {
+        this.logger.error(message);
     }
 }
