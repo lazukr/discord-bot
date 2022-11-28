@@ -1,30 +1,30 @@
 import { config } from "./configuration/Config.js";
 import { WinstonLogger, Logger } from "@lazukr/common";
 
-export class BotLogger {
-    private static _instance : BotLogger = new BotLogger();
+export class ServiceLogger {
+    private static _instance : ServiceLogger = new ServiceLogger();
     private logger: Logger;
     constructor() {
-        if (BotLogger._instance) {
+        if (ServiceLogger._instance) {
             throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
         }
         this.logger = new WinstonLogger(config);
-        BotLogger._instance = this;
+        ServiceLogger._instance = this;
     }
 
-    private static get Instance() : BotLogger {
-        return BotLogger._instance;
+    private static get Instance() : ServiceLogger {
+        return ServiceLogger._instance;
     }
 
     public static log(message: string) {
-        BotLogger.Instance.logger.log(message);
+        ServiceLogger.Instance.logger.log(message);
     }
 
     public static warn(message: string) {
-        BotLogger.Instance.logger.warn(message);
+        ServiceLogger.Instance.logger.warn(message);
     }
 
     public static error(message: string) {
-        BotLogger.Instance.logger.error(message);
+        ServiceLogger.Instance.logger.error(message);
     }
 }
