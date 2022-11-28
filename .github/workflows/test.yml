@@ -25,5 +25,7 @@ jobs:
         cache: 'yarn'
     - name: Install Dependencies
       run: yarn --frozen-lockfile
+    - name: Setup common package link
+      run: yarn setup-link
     - name: Run Tests
       run: yarn test
