@@ -14,7 +14,7 @@
   "scripts": {
     "start": "lerna run --parallel start",
     "test": "lerna run --parallel test",
-    "setup-dev": "yarn && yarn bootstrap && yarn link-all && yarn build",
+    "setup-dev": "yarn && yarn bootstrap && yarn setup-link && yarn build",
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "setup-link": "lerna exec --no-bail yarn common-unlink; yarn common-link",
