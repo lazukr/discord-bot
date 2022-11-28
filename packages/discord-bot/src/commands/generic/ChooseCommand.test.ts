@@ -1,6 +1,6 @@
 import { expect, test } from "@jest/globals";
-import { RandomIntegerGenerator } from "../../utils/randomInteger";
-import { choose } from "./ChooseCommand";
+import { RandomIntegerGenerator } from "../../utils/randomInteger.js";
+import { choose } from "./ChooseCommand.js";
 
 test("Empty input does not return any result.", () => {
     const args: string[] = [];

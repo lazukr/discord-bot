@@ -1,4 +1,4 @@
-import { CharGenOption } from "./charGenOption";
+import { CharGenOption } from "./charGenOption.js";
 
 export interface CharGenRequest {
     name: string;

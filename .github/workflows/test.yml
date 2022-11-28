@@ -25,5 +25,11 @@ jobs:
         cache: 'yarn'
     - name: Install Dependencies
       run: yarn --frozen-lockfile
+    - name: Lerna Bootstrap
+      run: yarn bootstrap
+    - name: Setup @lazukr/common package link
+      run: yarn setup-link
+    - name: Lerna Build
+      run: yarn build
     - name: Run Tests
       run: yarn test

@@ -1,5 +1,5 @@
 import { expect, test, jest } from "@jest/globals";
-import { randomInteger } from "./randomInteger";
+import { randomInteger } from "./randomInteger.js";
 
 test("minimum value is within range.", () => {
     const rand = () => {

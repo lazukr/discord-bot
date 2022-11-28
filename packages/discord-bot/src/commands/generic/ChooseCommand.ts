@@ -1,6 +1,6 @@
-import { Logger } from "../../Logger";
-import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger";
-import { RegisterableCommand } from "../RegisterableCommand";
+import { BotLogger } from "../../BotLogger.js";
+import { randomInteger, RandomIntegerGenerator } from "../../utils/randomInteger.js";
+import { RegisterableCommand } from "../RegisterableCommand.js";
 
 const COMMAND_NAME = "choose";
 
@@ -24,7 +24,7 @@ export const choose = (
 export const ChooseCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: (msg, args) => {
-        Logger.log(`Command [${COMMAND_NAME}] from ${msg.author} with args: ${args.join("")}`);
+        BotLogger.log(`Command [${COMMAND_NAME}] from ${msg.author} with args: ${args.join("")}`);
         const result = choose(args);
         return `\`${result}\``;
     },

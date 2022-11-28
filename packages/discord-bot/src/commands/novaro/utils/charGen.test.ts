@@ -1,7 +1,7 @@
 import { expect, test, describe } from "@jest/globals";
-import { CHARGEN_LINK, getCharGenLink } from "./charGen";
-import { CharGenOption } from "./charGenOption";
-import { CharGenRequest } from "./charGenRequest";
+import { CHARGEN_LINK, getCharGenLink } from "./charGen.js";
+import { CharGenOption } from "./charGenOption.js";
+import { CharGenRequest } from "./charGenRequest.js";
 
 test("charGen creates sig links", () => {
     const chargGenRequest: CharGenRequest = {

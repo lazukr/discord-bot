@@ -13,7 +13,6 @@
       "noImplicitAny": true,
       "useUnknownInCatchVariables": false,
       "inlineSourceMap": true,
-      "esModuleInterop": true,
-      "allowJs": true
+      "esModuleInterop": true
     }
   }
