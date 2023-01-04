@@ -1,5 +1,6 @@
 {
     "logToFile": true,
     "logToConsole": false,
-    "logToError": true
+    "logToError": true,
+    "cacheDuration": 60000
 }

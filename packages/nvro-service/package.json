@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@lazukr/common": "^1.0.0",
+    "cheerio": "^1.0.0-rc.12",
     "express": "^4.18.2",
     "got": "^12.5.2"
   },
@@ -22,6 +23,7 @@
   "scripts": {
     "dev": "ts-node-esm ./src/index.ts",
     "start": "node ./dist/src/index.js",
+    "jest": "jest",
     "build": "rm -rf ./dist && tsc --build",
     "common-link": "yarn link @lazukr/common"
   }

@@ -1,4 +1,4 @@
-import { config } from "./configuration/Config.js";
+import { loggerConfig } from "./configuration/Config.js";
 import { WinstonLogger, Logger } from "@lazukr/common";
 
 export class ServiceLogger {
@@ -8,7 +8,7 @@ export class ServiceLogger {
         if (ServiceLogger._instance) {
             throw new Error("Error: Instantiation Failed. Use 'Logger.instance' instead of new.");
         }
-        this.logger = new WinstonLogger(config);
+        this.logger = new WinstonLogger(loggerConfig);
         ServiceLogger._instance = this;
     }
 

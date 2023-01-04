@@ -1,14 +1,13 @@
 import Config from "config";
 import { LoggerConfig } from "@lazukr/common";
+import { CacheConfig } from "../cache/CacheConfig.js";
 
-export interface Config extends LoggerConfig {
-    logToConsole: boolean;
-    logToFile: boolean;
-    logToError: boolean;
-};
-
-export const config: Config = {
+export const loggerConfig: LoggerConfig = {
     logToConsole: Config.get("logToConsole"),
     logToFile: Config.get("logToFile"),
-    logToError: Config.get("logToError")
+    logToError: Config.get("logToError"),
+};
+
+export const cacheConfig: CacheConfig = {
+    cacheDuration: Config.get("cacheDuration")
 };
