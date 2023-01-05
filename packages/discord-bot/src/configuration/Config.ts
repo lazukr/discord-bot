@@ -9,6 +9,7 @@ export interface BotConfig extends LoggerConfig, DiscordConfig, ServiceConfig {
     logToError: boolean;
     token: string;
     prefix: string;
+    url: string;
 };
 
 export const config: BotConfig = {

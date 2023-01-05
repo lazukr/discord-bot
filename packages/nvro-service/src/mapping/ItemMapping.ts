@@ -3,6 +3,7 @@ import { NvroItemResponse } from "../dto/external/NvroItemResponse.js";
 import { BaseItem } from "../item/BaseItem.js";
 import { load } from "cheerio";
 import { ItemsResult } from "../item/ItemsResult.js";
+import { OutgoingItem, OutgoingItemList } from "../item/OutgoingItem.js";
   
 
 export class ItemMapping {
@@ -23,5 +24,26 @@ export class ItemMapping {
         }
         return result;
     }
-    
+
+    static FromBaseItemToOutgoingItem(baseItem: BaseItem): OutgoingItem {
+        const {
+            price,
+            location,
+            property,
+            qty,
+            refine,
+        } = baseItem;
+
+        return {
+            price: price.toLocaleString(),
+            location: location,
+            property: property?.join(", "),
+            qty: qty?.toLocaleString(),
+            refine: refine?.toLocaleString(),
+        };
+    }
+
+    static FromItemResultToOutgoingItemList(itemResult: ItemsResult): OutgoingItemList {
+        return itemResult.map(item => this.FromBaseItemToOutgoingItem(item));
+    }
 }

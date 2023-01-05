@@ -4,7 +4,7 @@ import { getCharGenLink } from "./utils/charGen.js";
 import { RegisterableCommand } from "../RegisterableCommand.js";
 import { CharGenRequest } from "./utils/charGenRequest.js";
 import { CharGenOption } from "./utils/charGenOption.js";
-import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/parser.js";
+import { parseCharGenConfig, parseCharGenArgs, CHAR_ACTION_MAX, CHAR_ROTATION_MAX } from "./utils/charGenParser.js";
 
 const COMMAND_NAME = "novachar";
 

@@ -4,7 +4,7 @@ import { getCharGenLink } from "./utils/charGen.js";
 import { RegisterableCommand } from "../RegisterableCommand.js";
 import { CharGenRequest } from "./utils/charGenRequest.js";
 import { CharGenOption } from "./utils/charGenOption.js";
-import { parseCharGenConfig, parseCharGenArgs, SIG_BG_MAX, SIG_POSE_MAX } from "./utils/parser.js";
+import { parseCharGenConfig, parseCharGenArgs, SIG_BG_MAX, SIG_POSE_MAX } from "./utils/charGenParser.js";
 
 const COMMAND_NAME = "novasig";
 

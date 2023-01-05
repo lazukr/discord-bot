@@ -5,6 +5,7 @@ import { ServiceLogger } from "./ServiceLogger.js";
 import { cacheConfig } from "./configuration/Config.js";
 import { ItemRequest } from "./dto/internal/ItemRequest.js";
 import { NvroWrapper } from "./NvroWrapper.js";
+import { ItemMapping } from "./mapping/ItemMapping.js";
 export class NvroService {
     app: Express.Application;
     itemManager: ItemManager;
@@ -32,7 +33,8 @@ export class NvroService {
                 const itemRequest = request.body as ItemRequest;
                 const results = await this.itemManager.get(itemRequest);
                 response.setHeader("Content-Type", "application/json");
-                response.json(results);
+                const transformedResult = ItemMapping.FromItemResultToOutgoingItemList(results);
+                response.json(transformedResult);
             }
             catch (err) {
                 ServiceLogger.warn(`getItemMarketById failed with the ${err}.`);
