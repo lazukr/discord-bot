@@ -3,6 +3,5 @@
     "logToFile": false,
     "logToConsole": false,
     "logToError": false,
-    "token": "",
-    "serviceUrl": ""
+    "token": ""
 }

@@ -1,5 +1,6 @@
 import { config } from "./configuration/Config.js";
-import { WinstonLogger, Logger } from "@lazukr/common";
+import { WinstonLogger } from "./logging/WinstonLogger.js";
+import { Logger } from "./logging/Logger.js";
 
 export class BotLogger {
     private static _instance : BotLogger = new BotLogger();
