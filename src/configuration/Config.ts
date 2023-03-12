@@ -1,9 +1,7 @@
 import Config from "config";
-import { LoggerConfig } from "@lazukr/common";
+import { LoggerConfig } from "../logging/LoggerConfig.js";
 import { DiscordConfig } from "./DiscordConfig.js";
-import { ServiceConfig } from "./ServiceConfig.js";
-
-export interface BotConfig extends LoggerConfig, DiscordConfig, ServiceConfig {
+export interface BotConfig extends LoggerConfig, DiscordConfig {
     logToConsole: boolean;
     logToFile: boolean;
     logToError: boolean;
@@ -17,5 +15,4 @@ export const config: BotConfig = {
     logToConsole: Config.get("logToConsole"),
     logToFile: Config.get("logToFile"),
     logToError: Config.get("logToError"),
-    url: Config.get("serviceUrl"),
 };
