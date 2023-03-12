@@ -11,7 +11,7 @@ const COMMAND_NAME = "novachar";
 export const NovaCharCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: async (msg, args) => {
-        BotLogger.log(`Command [${COMMAND_NAME}] ran from ${msg.author} with args: ${args}`);
+        BotLogger.log(`Command [${COMMAND_NAME}] ran from ${msg.author.id}-[${msg.author.username}] with args: ${args}`);
         const [name, config] = parseCharGenArgs(args);
 
         if (name === null) {
