@@ -24,8 +24,9 @@ export const choose = (
 export const ChooseCommand: RegisterableCommand = {
     name: COMMAND_NAME,
     command: (msg, args) => {
-        BotLogger.log(`Command [${COMMAND_NAME}] from ${msg.author} with args: ${args.join("")}`);
+        BotLogger.log(`Command [${COMMAND_NAME}] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join("")}`);
         const result = choose(args);
+        BotLogger.log(`Result from command [${COMMAND_NAME}]: ${result}`);
         return `\`${result}\``;
     },
     options: {
