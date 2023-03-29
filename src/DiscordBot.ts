@@ -1,4 +1,4 @@
-import { CommandClient, Constants } from "eris";
+import { CommandClient, Constants, TextableChannel } from "eris";
 import { BotLogger } from "./BotLogger.js";
 import { BotConfig } from "./configuration/Config.js";
 import { CommandList } from "./commands/CommandList.js";
@@ -50,8 +50,19 @@ export class DiscordBot extends CommandClient {
         for (const command of CommandList) {
             BotLogger.log(`Registering "${command.name}" command...`);
             const registeredCommand = this.registerCommand(command.name, command.command, command.options);
+            if (command.subCommand !== undefined && command.subCommand!.length > 0) {
+                for (const subCommand of command.subCommand!) {
+                    registeredCommand.registerSubcommand(subCommand.name, subCommand.command, subCommand.options);
+                    BotLogger.log(`Registered sub-command "${subCommand.name}" for "${command.name}" successfully!`);
+                }
+            }
             BotLogger.log(`Registered "${command.name}" successfully!`);
         }
+    }
+
+    sendMessage(channelid: string, message: string) {
+        const channel = this.getChannel(channelid) as TextableChannel;
+        channel.createMessage(message);
     }
 
     start() {
