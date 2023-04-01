@@ -7,8 +7,8 @@ import { RegisterableCommand } from "../RegisterableCommand.js";
 const COMMAND_NAME = "reminder";
 const USER_TZ = config.usertz;
 
-const IN_REGEX = /in(?!.+\sin)\s.+/;
-const AT_REGEX = /at(?!.+\sat)\s.+/;
+const IN_REGEX = /\sin(?!.+\sin)\s.+/;
+const AT_REGEX = /\sat(?!.+\sat)\s.+/;
 
 
 export enum DELETE_TYPE {
@@ -163,7 +163,7 @@ export const ReminderCommand: RegisterableCommand = {
         } = tryParseQueueInput(args);
 
         if (success === false) {
-            BotLogger.warn(`Could not parse queue input. message: ${message}. when: ${when}`);
+            BotLogger.warn(`Could not parse queue input. Original message: ${args.join(" ")}`);
             return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
         }
 
