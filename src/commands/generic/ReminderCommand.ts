@@ -1,33 +1,21 @@
-import * as Chrono from "chrono-node";
 import { TextChannel } from "eris";
+import { config } from "../../configuration/Config.js";
 import { BotLogger } from "../../BotLogger.js";
-import { Scheduler } from "../../Scheduler.js";
+import { ScheduleComponents, Scheduler, WHEN_TYPE } from "../../Scheduler.js";
 import { RegisterableCommand } from "../RegisterableCommand.js";
 
 const COMMAND_NAME = "reminder";
+const USER_TZ = config.usertz;
 
 const IN_REGEX = /in(?!.+\sin)\s.+/;
 const AT_REGEX = /at(?!.+\sat)\s.+/;
 
-export enum WHEN_TYPE {
-    NEITHER,
-    IN,
-    AT,
-};
 
 export enum DELETE_TYPE {
     INDEX,
     ID,
 };
 
-export interface ScheduleComponents {
-    message: string;
-    channelid: string,
-    channelname: string,
-    userid: string,
-    username: string,
-    queuedAt: number,
-};
 
 interface ParseQueueResult {
     success: boolean;
@@ -104,7 +92,6 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
 
 export const tryParseDeleteInput = (args: string): ParseDeleteResult => {
     const index = Number(args);
-    console.log(index);
     if (isNaN(index)) {
         return {
             result: args,
@@ -176,22 +163,24 @@ export const ReminderCommand: RegisterableCommand = {
         } = tryParseQueueInput(args);
 
         if (success === false) {
+            BotLogger.warn(`Could not parse queue input. message: ${message}. when: ${when}`);
             return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
         }
 
         var job = await Scheduler.schedule(when, {
             message: message,
-            userid: msg.author.mention,
+            userid: msg.author.id,
             username: msg.author.username,
             channelid: msg.channel.id,
             queuedAt: Date.now(),
             channelname: (msg.channel as TextChannel).name,
+        }, {
+            timezone: USER_TZ[msg.author.id],
+            whenType: type,
         });
 
         const sec = Math.floor(job.attrs.nextRunAt!.getTime() / 1000);
-
-        // relative if relative time, else absolute
-        return `Scheduled message \`${message}\` at <t:${sec}:${type === WHEN_TYPE.IN ? "R" : "f"}>`;
+        return `Scheduled message \`${message}\` at <t:${sec}:f>`;
     },
     options: {
         description: "Queues a reminder.",
@@ -205,7 +194,10 @@ export const ReminderCommand: RegisterableCommand = {
             name: "--list",
             command: async (msg, args) => {
                 BotLogger.log(`Command [${COMMAND_NAME} --list] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join(" ")}.`);
-                const list = await Scheduler.list(msg.author.mention);
+                const list = await Scheduler.list(msg.author.id);
+                
+                BotLogger.log(`Resulting list contains ${list.length} reminders.`);
+
                 if (list.length === 0) {
                     return "You have no reminders.";
                 }
@@ -219,6 +211,8 @@ export const ReminderCommand: RegisterableCommand = {
                     };
                 });
 
+                
+
                 return results.map(i => JSON.stringify(i)).join("\n");
             },
             options: {
@@ -230,14 +224,13 @@ export const ReminderCommand: RegisterableCommand = {
         {
             name: "--delete",
             command: async (msg, args) => {
-                
                 BotLogger.log(`Command [${COMMAND_NAME} --delete] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join(" ")}.`);
                 const parsed = tryParseDeleteInput(args.join(" "));
                 
                 if (parsed.type === DELETE_TYPE.ID) {
                     
                     BotLogger.log(`Deleting reminder for ${msg.author.id}-[${msg.author.username}] with id: ${parsed.result}.`);
-                    const result = await deleteById(msg.author.mention, parsed.result as string);
+                    const result = await deleteById(msg.author.id, parsed.result as string);
                     
                     if (result.success === false) {
                         BotLogger.error(`Failed to delete reminder for ${msg.author.id}-[${msg.author.username}] with id: ${result.idOrIndex}.`);
@@ -250,7 +243,7 @@ export const ReminderCommand: RegisterableCommand = {
                 else {
                     
                     BotLogger.log(`Deleting reminder for ${msg.author.id}-[${msg.author.username}] with index: ${parsed.result}.`);
-                    const result = await deleteByIndex(msg.author.mention, parsed.result as number);
+                    const result = await deleteByIndex(msg.author.id, parsed.result as number);
                     
                     if (result.success === false) {
                         BotLogger.error(`Failed to delete reminder for ${msg.author.id}-[${msg.author.username}] with index: ${result.idOrIndex}.`);
@@ -269,5 +262,19 @@ export const ReminderCommand: RegisterableCommand = {
                 argsRequired: true,
             }
         },
+        {
+            name: "--clear",
+            command: async (msg, args) => {
+                BotLogger.log(`Command [${COMMAND_NAME} --clear] from ${msg.author.id}-[${msg.author.username}].`);
+                const removedCount = await Scheduler.deleteByUserId(msg.author.id);
+                BotLogger.log(`Removed ${removedCount} reminders for ${msg.author.id}-[${msg.author.username}]`);
+                return `Removed ${removedCount} reminders.`;
+            },
+            options: {
+                description: "Removes all reminders you have queued.",
+                fullDescription: "Removes a reminder you have queued.",
+                aliases: ["--c"],
+            }
+        }
     ]
 };

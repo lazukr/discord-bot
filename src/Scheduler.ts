@@ -1,10 +1,30 @@
 import { Agenda, Job, JobWithId } from "@hokify/agenda";
+import { DateTime } from "luxon";
 import Eris from "eris";
 import { ObjectId } from "mongodb";
 import { BotLogger } from "./BotLogger.js";
-import { ScheduleComponents } from "./commands/generic/ReminderCommand.js";
 import { config } from "./configuration/Config.js";
 import { DiscordBot } from "./DiscordBot.js";
+
+export enum WHEN_TYPE {
+    NEITHER,
+    IN,
+    AT,
+};
+
+export interface ScheduleComponents {
+    message: string;
+    channelid: string,
+    channelname: string,
+    userid: string,
+    username: string,
+    queuedAt: number,
+};
+
+export interface TimezoneAdjust {
+    whenType: WHEN_TYPE,
+    timezone?: string;
+}
 
 export class Scheduler {
     private static agenda: Agenda;
@@ -23,7 +43,7 @@ export class Scheduler {
                 channelid,
             } = job.attrs.data as ScheduleComponents;
             const channel = bot.getChannel(channelid) as Eris.TextableChannel;
-            await channel.createMessage(`${userid} \`${message}\``);
+            await channel.createMessage(`<@${userid}> \`${message}\``);
         });
         
         Scheduler.attachListeners();
@@ -52,8 +72,31 @@ export class Scheduler {
         });
     }
 
-    static async schedule(when: string, schedule: ScheduleComponents): Promise<Job<ScheduleComponents>> {
-        return await Scheduler.agenda.schedule(when, "send message", schedule);
+    static async schedule(when: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
+        const {
+            timezone,
+            whenType,
+        } = tzadjust;
+        
+        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with when: "${when}" and tz: "${timezone}"`);
+        const job = await Scheduler.agenda.schedule(when, "send message", schedule);
+        const datetime = DateTime.fromJSDate(job.attrs.nextRunAt!);
+
+        // only do this if they are doing "at" time and there is a specific timezone associated
+        // "in" time is relative and doesn't matter
+        if (timezone !== undefined && whenType === WHEN_TYPE.AT) {
+            // we want the local time to remain the same and move the underlying time
+            // to the corresponding timezone
+            const zoned = datetime.setZone(timezone, {
+                keepLocalTime: true,
+            });
+
+            job.attrs.nextRunAt = zoned.toJSDate();
+            await job.save();
+        }
+
+        BotLogger.log(`Scheduled: ${job.attrs._id} to run at ${job.attrs.nextRunAt}.`);
+        return job;
     }
 
     static async list(userid: string) {
@@ -82,6 +125,15 @@ export class Scheduler {
             "data.userid": userid,
             _id: new ObjectId(id),
         });
+    }
+
+    static async deleteByUserId(userid: string) {
+        const result = await Scheduler.agenda.cancel({
+            name: "send message",
+            "data.userid": userid,
+        });
+
+        return result;
     }
 
     static async deleteById(userid: string, id: string) {
