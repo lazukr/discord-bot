@@ -1,5 +1,6 @@
 import { expect, test } from "@jest/globals";
-import { DELETE_TYPE, tryParseDeleteInput, tryParseQueueInput, WHEN_TYPE } from "./ReminderCommand.js";
+import { WHEN_TYPE } from "../../Scheduler.js";
+import { DELETE_TYPE, tryParseDeleteInput, tryParseQueueInput } from "./ReminderCommand.js";
 
 test("try parse input returns false when no matches found.", () => {
     const args = ["hello", "world"];

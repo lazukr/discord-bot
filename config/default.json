@@ -4,5 +4,6 @@
     "logToConsole": false,
     "logToError": false,
     "token": "",
-    "agenda": ""
+    "agenda": "",
+    "usertz": {}
 }
