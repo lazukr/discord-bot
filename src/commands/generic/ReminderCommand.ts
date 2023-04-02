@@ -10,6 +10,8 @@ const USER_TZ = config.usertz;
 const IN_REGEX = /\sin(?!.+\sin)\s.+/;
 const AT_REGEX = /\sat(?!.+\sat)\s.+/;
 
+const MAX_FIELDS = 25;
+
 
 export enum DELETE_TYPE {
     INDEX,
@@ -35,6 +37,13 @@ interface DeleteResponse {
     idOrIndex: string | number;
     data?: ScheduleComponents;
 };
+
+interface ReminderInfo {
+    index: number;
+    id: string;
+    message: string;
+    nextRunAt: number;
+}
 
 export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     const sentence = args.join(" ");
@@ -155,6 +164,12 @@ export const ReminderCommand: RegisterableCommand = {
             return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
         }
 
+        const list = await Scheduler.list(msg.author.id);
+
+        if (list.length >= MAX_FIELDS) {
+            return `Please don't queue more than ${MAX_FIELDS} reminders.`;
+        }
+
         const {
             success,
             when,
@@ -202,22 +217,41 @@ export const ReminderCommand: RegisterableCommand = {
                     return "You have no reminders.";
                 }
 
-                const results = list.map(l => {
+                const total = list.length;
+
+                const results = list.map((l, index) => {
                     const data = l.attrs.data as ScheduleComponents;
                     return {
-                        id: l.attrs._id,
+                        index: index + 1,
+                        id: l.attrs._id!.toString(),
                         message: data.message,
-                        nextRunAt: l.attrs.nextRunAt,
+                        nextRunAt: Math.floor(l.attrs.nextRunAt!.getTime() / 1000),
                     };
                 });
 
-                
+                const subResults = results.slice(0, MAX_FIELDS);
 
-                return results.map(i => JSON.stringify(i)).join("\n");
+                const field = {
+                    name: `\`##  message ${" ".repeat(22)}  when ${" ".repeat(16)}\``,
+                    value: subResults.map(l => {
+                        return `\`${l.index.toString().padEnd(2, " ")}  ${l.message.substring(0, 30).padEnd(30, " ")}  \`<t:${l.nextRunAt}:f>`;
+                    }).join("\n"),
+                };
+
+                return {
+                    embed: {
+                        title: `${msg.author.username}'s reminders`,
+                        fields: [field],
+                        footer: {
+                            text: `Showing from ${subResults[0].index} to ${subResults[subResults.length - 1].index} out of a total of ${total}`,
+                        }
+                    }
+                };
             },
             options: {
                 description: "Lists the reminders you have.",
                 fullDescription: "Lists the reminders you have.",
+                usage: "<page>",
                 aliases: ["--l"],
             }
         },
@@ -227,21 +261,7 @@ export const ReminderCommand: RegisterableCommand = {
                 BotLogger.log(`Command [${COMMAND_NAME} --delete] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join(" ")}.`);
                 const parsed = tryParseDeleteInput(args.join(" "));
                 
-                if (parsed.type === DELETE_TYPE.ID) {
-                    
-                    BotLogger.log(`Deleting reminder for ${msg.author.id}-[${msg.author.username}] with id: ${parsed.result}.`);
-                    const result = await deleteById(msg.author.id, parsed.result as string);
-                    
-                    if (result.success === false) {
-                        BotLogger.error(`Failed to delete reminder for ${msg.author.id}-[${msg.author.username}] with id: ${result.idOrIndex}.`);
-                        return result.message;
-                    }
-                
-                    BotLogger.log(`Successfully deleted reminder for ${msg.author.id}-[${msg.author.username}] with id: ${result.idOrIndex}.`);
-                    return result.message;
-                }
-                else {
-                    
+                if (parsed.type === DELETE_TYPE.INDEX) {
                     BotLogger.log(`Deleting reminder for ${msg.author.id}-[${msg.author.username}] with index: ${parsed.result}.`);
                     const result = await deleteByIndex(msg.author.id, parsed.result as number);
                     
@@ -253,12 +273,15 @@ export const ReminderCommand: RegisterableCommand = {
                     BotLogger.log(`Successfully deleted reminder for ${msg.author.id}-[${msg.author.username}] with index: ${result.idOrIndex}.`);
                     return result.message;
                 }
+                else {
+                    return "Invalid index provided.";
+                }
             },
             options: {
                 description: "Removes a reminder you have queued.",
-                fullDescription: "Removes a reminder you have queued either by id or by index.",
-                aliases: ["--del", "--d"],
-                usage: "<id> / [index]",
+                fullDescription: "Removes a reminder you have queued by index.",
+                aliases: ["--del", "--d", "--remove", "--r"],
+                usage: "<index>",
                 argsRequired: true,
             }
         },
