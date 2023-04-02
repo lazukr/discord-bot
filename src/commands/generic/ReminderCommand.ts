@@ -65,7 +65,7 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     if (inMatch !== null && atMatch === null) {
         return {
             success: true,
-            when: inMatch[0],
+            when: inMatch[0].trim(),
             message: inMatch.input!.substring(0, inMatch.index).trim(),
             type: WHEN_TYPE.IN,
         };
@@ -75,7 +75,7 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     if (inMatch === null && atMatch !== null) {
         return {
             success: true,
-            when: atMatch[0],
+            when: atMatch[0].trim(),
             message: atMatch.input!.substring(0, atMatch.index).trim(),
             type: WHEN_TYPE.AT,
         };
@@ -85,14 +85,14 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     if (inMatch!.index! > atMatch!.index!) {
         return {
             success: true,
-            when: inMatch![0],
+            when: inMatch![0].trim(),
             message: inMatch!.input!.substring(0, inMatch!.index).trim(),
             type: WHEN_TYPE.IN,
         };
     } else {
         return {
             success: true,
-            when: atMatch![0],
+            when: atMatch![0].trim(),
             message: atMatch!.input!.substring(0, atMatch!.index).trim(),
             type: WHEN_TYPE.AT,
         };
