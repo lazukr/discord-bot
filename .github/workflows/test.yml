@@ -41,9 +41,9 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        # using pm2 to keep app alive forever
+        # using pm2 to keep app alive forever, source nvm may be needed to ssh in and use pm2
         script: |
           cd ${{ secrets.DIR }}
           git checkout main
           git pull
-          pm2 restart all
+          source ~/.nvm/nvm.sh && pm2 restart all
