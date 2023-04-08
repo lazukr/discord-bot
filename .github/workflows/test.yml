@@ -41,7 +41,9 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        # using pm2 to keep app alive forever
         script: |
           cd ${{ secrets.DIR }}
           git checkout main
           git pull
+          pm2 restart all
