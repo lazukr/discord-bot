@@ -46,5 +46,5 @@ jobs:
           cd ${{ secrets.DIR }}
           git checkout main
           git pull
-          yarn build
+          source ~/.nvm/nvm.sh && yarn build
           source ~/.nvm/nvm.sh && pm2 restart all
