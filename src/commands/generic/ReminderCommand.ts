@@ -200,7 +200,7 @@ export const ReminderCommand: RegisterableCommand = {
     options: {
         description: "Queues a reminder.",
         fullDescription: "Queues a reminder. Requires you to include an `at` or `in` somewhere in the sentence for it to determine when to schedule it. Use `at` if you want a specific time. Use `in` if you want a relative time.",
-        usage: "`<message> <at <exact time> | in <relative time>>`",
+        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\``",
         aliases: ["rmb"],
         argsRequired: true,
     },
