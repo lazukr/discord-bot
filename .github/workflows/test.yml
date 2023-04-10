@@ -36,10 +36,10 @@ jobs:
     steps:
     - name: create config json
       uses: jsdaniell/create-json@1.1.2
-        with:
-          name: "production.json"
-          dir: "config/"
-          json: ${{ secrets.CONFIG }}
+      with:
+        name: "production.json"
+        dir: "config/"
+        json: ${{ secrets.CONFIG }}
     - name: copy config to prod
       uses: appleboy/scp-action@v0.1.4
       with:
