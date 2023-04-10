@@ -8,6 +8,7 @@ export interface BotConfig extends LoggerConfig, DiscordConfig {
     token: string;
     prefix: string;
     agenda: string;
+    collection: string;
     usertz: {[key: string]: string}
 };
 
@@ -19,4 +20,5 @@ export const config: BotConfig = {
     logToError: Config.get("logToError"),
     agenda: Config.get("agenda"),
     usertz: Config.get("usertz"),
+    collection: Config.get("collection"),
 };
