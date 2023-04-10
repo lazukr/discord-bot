@@ -33,6 +33,7 @@ export class Scheduler {
         Scheduler.agenda = new Agenda({
             db: {
                 address: config.agenda,
+                collection: config.collection,
             }
         });
         

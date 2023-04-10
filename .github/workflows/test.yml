@@ -44,6 +44,8 @@ jobs:
         # using pm2 to keep app alive forever, source nvm may be needed to ssh in and use pm2
         script: |
           cd ${{ secrets.DIR }}
+          cd ./config
+          echo ${{ secrets.CONFIG }} > production.json
           git checkout main
           git pull
           source ~/.nvm/nvm.sh && yarn build
