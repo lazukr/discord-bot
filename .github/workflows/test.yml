@@ -46,7 +46,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "config/production.json"
+        source: "production.json"
         target: "${{ secrets.DIR }}/config/"
     - name: pull latest and start
       uses: appleboy/ssh-action@v0.1.9
