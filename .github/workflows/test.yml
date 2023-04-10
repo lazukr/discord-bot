@@ -38,7 +38,6 @@ jobs:
       uses: jsdaniell/create-json@1.1.2
       with:
         name: "production.json"
-        dir: "config/"
         json: ${{ secrets.CONFIG }}
     - name: copy config to prod
       uses: appleboy/scp-action@v0.1.4
@@ -47,7 +46,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "config/production.json"
+        source: "production.json"
         target: "${{ secrets.DIR }}/config/"
     - name: pull latest and start
       uses: appleboy/ssh-action@v0.1.9
