@@ -10,6 +10,7 @@ export enum WHEN_TYPE {
     NEITHER,
     IN,
     AT,
+    CRON,
 };
 
 export interface ScheduleComponents {
@@ -19,6 +20,7 @@ export interface ScheduleComponents {
     userid: string,
     username: string,
     queuedAt: number,
+    type: WHEN_TYPE,
 };
 
 export interface TimezoneAdjust {
@@ -72,6 +74,21 @@ export class Scheduler {
             BotLogger.log(`Job[${job.attrs._id}] completed successfully and removed (${result}) from database.`);
         });
     }
+
+    static async scheduleCron(cron: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
+        const {
+            timezone,
+            whenType,
+        } = tzadjust;
+
+        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with cron: "${cron}" and tz: "${timezone}"`);
+        const job = await Scheduler.agenda.every(cron, "send message", schedule, {
+            timezone: timezone,
+        });
+
+        BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
+        return job;
+    } 
 
     static async schedule(when: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
         const {

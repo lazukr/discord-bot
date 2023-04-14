@@ -9,6 +9,7 @@ const USER_TZ = config.usertz;
 
 const IN_REGEX = /\sin(?!.+\sin)\s.+/;
 const AT_REGEX = /\sat(?!.+\sat)\s.+/;
+const CRON_REGEX = /\scron(?!.+\scron)\s.+/;
 
 const MAX_FIELDS = 25;
 
@@ -38,21 +39,15 @@ interface DeleteResponse {
     data?: ScheduleComponents;
 };
 
-interface ReminderInfo {
-    index: number;
-    id: string;
-    message: string;
-    nextRunAt: number;
-}
-
 export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     const sentence = args.join(" ");
     
     const inMatch = sentence.match(IN_REGEX);
     const atMatch = sentence.match(AT_REGEX);
+    const cronMatch = sentence.match(CRON_REGEX);
 
     // no matches
-    if (inMatch === null && atMatch === null) {
+    if (inMatch === null && atMatch === null && cronMatch === null) {
         return {
             success: false,
             when: "",
@@ -61,42 +56,33 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
         };
     }
 
-    // in match only
-    if (inMatch !== null && atMatch === null) {
-        return {
-            success: true,
-            when: inMatch[0].trim(),
-            message: inMatch.input!.substring(0, inMatch.index).trim(),
+    const sortedMatch = [
+        {
+            matcher: inMatch,
             type: WHEN_TYPE.IN,
-        };
-    }
-
-    // at match only
-    if (inMatch === null && atMatch !== null) {
-        return {
-            success: true,
-            when: atMatch[0].trim(),
-            message: atMatch.input!.substring(0, atMatch.index).trim(),
+        },
+        {
+            matcher: atMatch,
             type: WHEN_TYPE.AT,
-        };
-    }
+        },
+        {
+            matcher: cronMatch,
+            type: WHEN_TYPE.CRON,
+        }]
+        .filter(m => m.matcher !== null)
+        .sort((a, b) => (b.matcher?.index ?? 0) - (a.matcher?.index ?? 0));
 
-    // both exist, need to compare to see which one is closer to the end and use that
-    if (inMatch!.index! > atMatch!.index!) {
-        return {
-            success: true,
-            when: inMatch![0].trim(),
-            message: inMatch!.input!.substring(0, inMatch!.index).trim(),
-            type: WHEN_TYPE.IN,
-        };
-    } else {
-        return {
-            success: true,
-            when: atMatch![0].trim(),
-            message: atMatch!.input!.substring(0, atMatch!.index).trim(),
-            type: WHEN_TYPE.AT,
-        };
-    }
+    const {
+        matcher,
+        type,
+    } = sortedMatch[0];
+
+    return {
+        success: true,
+        when: matcher![0].trim(),
+        message: matcher!.input!.substring(0, matcher!.index).trim(),
+        type: type,
+    };
 };
 
 export const tryParseDeleteInput = (args: string): ParseDeleteResult => {
@@ -189,6 +175,7 @@ export const ReminderCommand: RegisterableCommand = {
             channelid: msg.channel.id,
             queuedAt: Date.now(),
             channelname: (msg.channel as TextChannel).name,
+            type: type,
         }, {
             timezone: USER_TZ[msg.author.id],
             whenType: type,
