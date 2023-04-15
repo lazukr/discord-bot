@@ -68,6 +68,13 @@ export class Scheduler {
         });
 
         Scheduler.agenda.on("success:send message", async job => {
+            const { type } = job.attrs.data as ScheduleComponents;
+
+            // don't remove cron type
+            if (type === WHEN_TYPE.CRON) {
+                return;
+            }
+
             const result = await this.agenda.cancel({
                 _id: job.attrs._id,
             });
@@ -75,28 +82,29 @@ export class Scheduler {
         });
     }
 
-    static async scheduleCron(cron: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
-        const {
-            timezone,
-            whenType,
-        } = tzadjust;
-
-        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with cron: "${cron}" and tz: "${timezone}"`);
-        const job = await Scheduler.agenda.every(cron, "send message", schedule, {
-            timezone: timezone,
-        });
-
-        BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
-        return job;
-    } 
-
     static async schedule(when: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
         const {
             timezone,
             whenType,
         } = tzadjust;
         
-        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with when: "${when}" and tz: "${timezone}"`);
+        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with when: "${when}"[type=${WHEN_TYPE[whenType]}] and tz: "${timezone}"`);
+        
+        // handles cron
+        if (whenType === WHEN_TYPE.CRON) {
+            const cron = when.replace("cron", "").trim();
+            const job = await Scheduler.agenda.create("send message", schedule);
+            job.repeatEvery(cron, {
+                timezone: timezone,
+            });
+            await job.save();
+
+            console.log(job);
+
+            BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
+            return job;
+        }
+        
         const job = await Scheduler.agenda.schedule(when, "send message", schedule);
         const datetime = DateTime.fromJSDate(job.attrs.nextRunAt!);
 

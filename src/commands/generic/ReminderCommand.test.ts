@@ -86,6 +86,20 @@ test("try parse input returns the latter of two cases if both found (in).", () =
     expect(type).toBe(WHEN_TYPE.IN);
 });
 
+test("try parse input returns cron case.", () => {
+    const args = "hello world cron */5 * * * *".split(" ");
+    const {
+        success,
+        when,
+        message,
+        type,
+    } = tryParseQueueInput(args);
+    expect(success).toBe(true);
+    expect(message).toBe("hello world");
+    expect(when).toBe("cron */5 * * * *");
+    expect(type).toBe(WHEN_TYPE.CRON);
+});
+
 test("try parse delete returns index version.", () => {
     const args = "3";
     const {

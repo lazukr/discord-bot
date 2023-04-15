@@ -186,8 +186,24 @@ export const ReminderCommand: RegisterableCommand = {
     },
     options: {
         description: "Queues a reminder.",
-        fullDescription: "Queues a reminder. Requires you to include an `at` or `in` somewhere in the sentence for it to determine when to schedule it. Use `at` if you want a specific time. Use `in` if you want a relative time.",
-        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\``",
+        fullDescription: "Queues a reminder. Requires you to include one of the following clauses: \n\
+- `at` for specific time. I.e. `x at 5 pm`. \n\
+- `in` for relative time. I.e. `x in 5 hours`. \n\
+- `cron` for recurring time. I.e. `x cron 0 0 0 0 1`. \n\
+for reference, here is the cron parameters: \n\
+```\
+*    *    *    *    *    * \n\
+┬    ┬    ┬    ┬    ┬    ┬ \n\
+│    │    │    │    │    | \n\
+│    │    │    │    │    └ day of week (0 - 7, 1L - 7L) (0 or 7 is Sun) \n\
+│    │    │    │    └───── month (1 - 12) \n\
+│    │    │    └────────── day of month (1 - 31, L) \n\
+│    │    └─────────────── hour (0 - 23) \n\
+│    └──────────────────── minute (0 - 59) \n\
+└───────────────────────── second (0 - 59, optional).\
+        ```\n\
+        refer to <https://crontab.guru/> to find the right combination.",
+        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\` or \`<message> cron <recurring time>\``",
         aliases: ["rmb"],
         argsRequired: true,
     },
@@ -208,20 +224,23 @@ export const ReminderCommand: RegisterableCommand = {
 
                 const results = list.map((l, index) => {
                     const data = l.attrs.data as ScheduleComponents;
+                    const nextRunAt = data.type === WHEN_TYPE.CRON ? 
+                        `\`${l.attrs.repeatInterval}\`` : 
+                        `<t:${Math.floor(l.attrs.nextRunAt!.getTime() / 1000)}:f>`;
                     return {
                         index: index + 1,
                         id: l.attrs._id!.toString(),
                         message: data.message,
-                        nextRunAt: Math.floor(l.attrs.nextRunAt!.getTime() / 1000),
+                        nextRunAt: nextRunAt,
                     };
                 });
 
                 const subResults = results.slice(0, MAX_FIELDS);
 
                 const field = {
-                    name: `\`##  message ${" ".repeat(22)}  when ${" ".repeat(16)}\``,
+                    name: `\`##  message ${" ".repeat(22)}  when / cron ${" ".repeat(8)}\``,
                     value: subResults.map(l => {
-                        return `\`${l.index.toString().padEnd(2, " ")}  ${l.message.substring(0, 30).padEnd(30, " ")}  \`<t:${l.nextRunAt}:f>`;
+                        return `\`${l.index.toString().padEnd(2, " ")}  ${l.message.substring(0, 30).padEnd(30, " ")} \` ${l.nextRunAt}`;
                     }).join("\n"),
                 };
 
