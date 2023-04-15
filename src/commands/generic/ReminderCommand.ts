@@ -9,6 +9,7 @@ const USER_TZ = config.usertz;
 
 const IN_REGEX = /\sin(?!.+\sin)\s.+/;
 const AT_REGEX = /\sat(?!.+\sat)\s.+/;
+const CRON_REGEX = /\scron(?!.+\scron)\s.+/;
 
 const MAX_FIELDS = 25;
 
@@ -38,21 +39,15 @@ interface DeleteResponse {
     data?: ScheduleComponents;
 };
 
-interface ReminderInfo {
-    index: number;
-    id: string;
-    message: string;
-    nextRunAt: number;
-}
-
 export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
     const sentence = args.join(" ");
     
     const inMatch = sentence.match(IN_REGEX);
     const atMatch = sentence.match(AT_REGEX);
+    const cronMatch = sentence.match(CRON_REGEX);
 
     // no matches
-    if (inMatch === null && atMatch === null) {
+    if (inMatch === null && atMatch === null && cronMatch === null) {
         return {
             success: false,
             when: "",
@@ -61,42 +56,33 @@ export const tryParseQueueInput = (args: string[]): ParseQueueResult => {
         };
     }
 
-    // in match only
-    if (inMatch !== null && atMatch === null) {
-        return {
-            success: true,
-            when: inMatch[0].trim(),
-            message: inMatch.input!.substring(0, inMatch.index).trim(),
+    const sortedMatch = [
+        {
+            matcher: inMatch,
             type: WHEN_TYPE.IN,
-        };
-    }
-
-    // at match only
-    if (inMatch === null && atMatch !== null) {
-        return {
-            success: true,
-            when: atMatch[0].trim(),
-            message: atMatch.input!.substring(0, atMatch.index).trim(),
+        },
+        {
+            matcher: atMatch,
             type: WHEN_TYPE.AT,
-        };
-    }
+        },
+        {
+            matcher: cronMatch,
+            type: WHEN_TYPE.CRON,
+        }]
+        .filter(m => m.matcher !== null)
+        .sort((a, b) => (b.matcher?.index ?? 0) - (a.matcher?.index ?? 0));
 
-    // both exist, need to compare to see which one is closer to the end and use that
-    if (inMatch!.index! > atMatch!.index!) {
-        return {
-            success: true,
-            when: inMatch![0].trim(),
-            message: inMatch!.input!.substring(0, inMatch!.index).trim(),
-            type: WHEN_TYPE.IN,
-        };
-    } else {
-        return {
-            success: true,
-            when: atMatch![0].trim(),
-            message: atMatch!.input!.substring(0, atMatch!.index).trim(),
-            type: WHEN_TYPE.AT,
-        };
-    }
+    const {
+        matcher,
+        type,
+    } = sortedMatch[0];
+
+    return {
+        success: true,
+        when: matcher![0].trim(),
+        message: matcher!.input!.substring(0, matcher!.index).trim(),
+        type: type,
+    };
 };
 
 export const tryParseDeleteInput = (args: string): ParseDeleteResult => {
@@ -161,7 +147,7 @@ export const ReminderCommand: RegisterableCommand = {
         BotLogger.log(`Command [${COMMAND_NAME}] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join(" ")}`);
         
         if (args.length === 0) {
-            return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
+            return "Need to provide a message an `at` clause, `in` clause or `cron` clause.";
         }
 
         const list = await Scheduler.list(msg.author.id);
@@ -179,7 +165,7 @@ export const ReminderCommand: RegisterableCommand = {
 
         if (success === false) {
             BotLogger.warn(`Could not parse queue input. Original message: ${args.join(" ")}`);
-            return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
+            return "Need to provide a message an `at` clause, `in` clause or `cron` clause.";
         }
 
         var job = await Scheduler.schedule(when, {
@@ -189,6 +175,7 @@ export const ReminderCommand: RegisterableCommand = {
             channelid: msg.channel.id,
             queuedAt: Date.now(),
             channelname: (msg.channel as TextChannel).name,
+            type: type,
         }, {
             timezone: USER_TZ[msg.author.id],
             whenType: type,
@@ -199,8 +186,24 @@ export const ReminderCommand: RegisterableCommand = {
     },
     options: {
         description: "Queues a reminder.",
-        fullDescription: "Queues a reminder. Requires you to include an `at` or `in` somewhere in the sentence for it to determine when to schedule it. Use `at` if you want a specific time. Use `in` if you want a relative time.",
-        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\``",
+        fullDescription: "Queues a reminder. Requires you to include one of the following clauses: \n\
+- `at` for specific time. e.g.: x at 5 pm. \n\
+- `in` for relative time. e.g.: x in 5 hours. \n\
+- `cron` for recurring time. e.g.: x cron `0 0 0 0 1`. (backticks are optional but useful if using \\*) \n\
+for reference, here is the cron parameters: \n\
+```\
+*    *    *    *    *    * \n\
+┬    ┬    ┬    ┬    ┬    ┬ \n\
+│    │    │    │    │    | \n\
+│    │    │    │    │    └ day of week (0 - 7, 1L - 7L) (0 or 7 is Sun) \n\
+│    │    │    │    └───── month (1 - 12) \n\
+│    │    │    └────────── day of month (1 - 31, L) \n\
+│    │    └─────────────── hour (0 - 23) \n\
+│    └──────────────────── minute (0 - 59) \n\
+└───────────────────────── second (0 - 59, optional).\
+        ```\n\
+        refer to <https://crontab.guru/> to find the right combination.",
+        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\` or \`<message> cron <recurring time>\``",
         aliases: ["rmb"],
         argsRequired: true,
     },
@@ -221,20 +224,23 @@ export const ReminderCommand: RegisterableCommand = {
 
                 const results = list.map((l, index) => {
                     const data = l.attrs.data as ScheduleComponents;
+                    const nextRunAt = data.type === WHEN_TYPE.CRON ? 
+                        `\`${l.attrs.repeatInterval}\`` : 
+                        `<t:${Math.floor(l.attrs.nextRunAt!.getTime() / 1000)}:f>`;
                     return {
                         index: index + 1,
                         id: l.attrs._id!.toString(),
                         message: data.message,
-                        nextRunAt: Math.floor(l.attrs.nextRunAt!.getTime() / 1000),
+                        nextRunAt: nextRunAt,
                     };
                 });
 
                 const subResults = results.slice(0, MAX_FIELDS);
 
                 const field = {
-                    name: `\`##  message ${" ".repeat(22)}  when ${" ".repeat(16)}\``,
+                    name: `\`##  message ${" ".repeat(22)}  when / cron ${" ".repeat(8)}\``,
                     value: subResults.map(l => {
-                        return `\`${l.index.toString().padEnd(2, " ")}  ${l.message.substring(0, 30).padEnd(30, " ")}  \`<t:${l.nextRunAt}:f>`;
+                        return `\`${l.index.toString().padEnd(2, " ")}  ${l.message.substring(0, 30).padEnd(30, " ")} \` ${l.nextRunAt}`;
                     }).join("\n"),
                 };
 

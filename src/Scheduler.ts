@@ -10,6 +10,7 @@ export enum WHEN_TYPE {
     NEITHER,
     IN,
     AT,
+    CRON,
 };
 
 export interface ScheduleComponents {
@@ -19,6 +20,7 @@ export interface ScheduleComponents {
     userid: string,
     username: string,
     queuedAt: number,
+    type: WHEN_TYPE,
 };
 
 export interface TimezoneAdjust {
@@ -66,6 +68,13 @@ export class Scheduler {
         });
 
         Scheduler.agenda.on("success:send message", async job => {
+            const { type } = job.attrs.data as ScheduleComponents;
+
+            // don't remove cron type
+            if (type === WHEN_TYPE.CRON) {
+                return;
+            }
+
             const result = await this.agenda.cancel({
                 _id: job.attrs._id,
             });
@@ -79,7 +88,24 @@ export class Scheduler {
             whenType,
         } = tzadjust;
         
-        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with when: "${when}" and tz: "${timezone}"`);
+        BotLogger.log(`Scheduling: ${JSON.stringify(schedule)} with when: "${when}"[type=${WHEN_TYPE[whenType]}] and tz: "${timezone}"`);
+        
+        // handles cron
+        if (whenType === WHEN_TYPE.CRON) {
+            // remove cron from the actual crom parameters
+            // also replace backticks if used
+            const cron = when.replace("cron", "").trim().replace(/\`/g, "");
+            console.log(cron);
+            const job = await Scheduler.agenda.create("send message", schedule);
+            job.repeatEvery(cron, {
+                timezone: timezone,
+            });
+            await job.save();
+
+            BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
+            return job;
+        }
+        
         const job = await Scheduler.agenda.schedule(when, "send message", schedule);
         const datetime = DateTime.fromJSDate(job.attrs.nextRunAt!);
 
