@@ -147,7 +147,7 @@ export const ReminderCommand: RegisterableCommand = {
         BotLogger.log(`Command [${COMMAND_NAME}] from ${msg.author.id}-[${msg.author.username}] with args: ${args.join(" ")}`);
         
         if (args.length === 0) {
-            return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
+            return "Need to provide a message an `at` clause, `in` clause or `cron` clause.";
         }
 
         const list = await Scheduler.list(msg.author.id);
@@ -165,7 +165,7 @@ export const ReminderCommand: RegisterableCommand = {
 
         if (success === false) {
             BotLogger.warn(`Could not parse queue input. Original message: ${args.join(" ")}`);
-            return "Need to provide a message with either an `at` qualifier or `in` qualifier.";
+            return "Need to provide a message an `at` clause, `in` clause or `cron` clause.";
         }
 
         var job = await Scheduler.schedule(when, {
@@ -187,9 +187,9 @@ export const ReminderCommand: RegisterableCommand = {
     options: {
         description: "Queues a reminder.",
         fullDescription: "Queues a reminder. Requires you to include one of the following clauses: \n\
-- `at` for specific time. I.e. `x at 5 pm`. \n\
-- `in` for relative time. I.e. `x in 5 hours`. \n\
-- `cron` for recurring time. I.e. `x cron 0 0 0 0 1`. \n\
+- `at` for specific time. e.g.: x at 5 pm. \n\
+- `in` for relative time. e.g.: x in 5 hours. \n\
+- `cron` for recurring time. e.g.: x cron `0 0 0 0 1`. (backticks are optional but useful if using \\*) \n\
 for reference, here is the cron parameters: \n\
 ```\
 *    *    *    *    *    * \n\

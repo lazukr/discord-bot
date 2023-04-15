@@ -92,7 +92,10 @@ export class Scheduler {
         
         // handles cron
         if (whenType === WHEN_TYPE.CRON) {
-            const cron = when.replace("cron", "").trim();
+            // remove cron from the actual crom parameters
+            // also replace backticks if used
+            const cron = when.replace("cron", "").trim().replace(/\`/g, "");
+            console.log(cron);
             const job = await Scheduler.agenda.create("send message", schedule);
             job.repeatEvery(cron, {
                 timezone: timezone,
