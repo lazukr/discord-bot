@@ -99,8 +99,6 @@ export class Scheduler {
             });
             await job.save();
 
-            console.log(job);
-
             BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
             return job;
         }
