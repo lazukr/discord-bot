@@ -23,6 +23,11 @@ export interface ScheduleComponents {
     type: WHEN_TYPE,
 };
 
+export interface SchedulingResult {
+    job: Job<ScheduleComponents>;
+    failReason?: string;
+};
+
 export interface TimezoneAdjust {
     whenType: WHEN_TYPE,
     timezone?: string;
@@ -82,7 +87,7 @@ export class Scheduler {
         });
     }
 
-    static async schedule(when: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<Job<ScheduleComponents>> {
+    static async schedule(when: string, schedule: ScheduleComponents, tzadjust: TimezoneAdjust): Promise<SchedulingResult> {
         const {
             timezone,
             whenType,
@@ -95,15 +100,25 @@ export class Scheduler {
             // remove cron from the actual crom parameters
             // also replace backticks if used
             const cron = when.replace("cron", "").trim().replace(/\`/g, "");
-            console.log(cron);
+       
             const job = await Scheduler.agenda.create("send message", schedule);
-            job.repeatEvery(cron, {
+            const resultingJob = job.repeatEvery(cron, {
                 timezone: timezone,
             });
-            await job.save();
 
+            if ((resultingJob.attrs.failCount ?? 0) > 0) {
+                BotLogger.log(`Scheduled failed: ${resultingJob.attrs.failReason}`);
+                return {
+                    job: resultingJob,
+                    failReason: resultingJob.attrs.failReason!,
+                };
+            }
+
+            await job.save();
             BotLogger.log(`Scheduled: ${job.attrs._id} to run every ${job.attrs.nextRunAt}.`);
-            return job;
+            return {
+                job: job,
+            };
         }
         
         const job = await Scheduler.agenda.schedule(when, "send message", schedule);
@@ -123,7 +138,9 @@ export class Scheduler {
         }
 
         BotLogger.log(`Scheduled: ${job.attrs._id} to run at ${job.attrs.nextRunAt}.`);
-        return job;
+        return {
+            job: job,
+        };
     }
 
     static async list(userid: string) {

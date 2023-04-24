@@ -1,8 +1,10 @@
 import { TextChannel } from "eris";
+import Cronstrue from "cronstrue";
 import { config } from "../../configuration/Config.js";
 import { BotLogger } from "../../BotLogger.js";
 import { ScheduleComponents, Scheduler, WHEN_TYPE } from "../../Scheduler.js";
 import { RegisterableCommand } from "../RegisterableCommand.js";
+
 
 const COMMAND_NAME = "reminder";
 const USER_TZ = config.usertz;
@@ -168,7 +170,10 @@ export const ReminderCommand: RegisterableCommand = {
             return "Need to provide a message an `at` clause, `in` clause or `cron` clause.";
         }
 
-        var job = await Scheduler.schedule(when, {
+        var {
+            job,
+            failReason,
+        } = await Scheduler.schedule(when, {
             message: message,
             userid: msg.author.id,
             username: msg.author.username,
@@ -181,6 +186,14 @@ export const ReminderCommand: RegisterableCommand = {
             whenType: type,
         });
 
+        if (failReason !== undefined) {
+            return failReason;
+        }
+
+        if (type === WHEN_TYPE.CRON) {
+            return `Scheduled message \`${message}\` ${Cronstrue.toString(job.attrs.repeatInterval as string, {verbose: true}).toLocaleLowerCase()}`;
+        }
+
         const sec = Math.floor(job.attrs.nextRunAt!.getTime() / 1000);
         return `Scheduled message \`${message}\` at <t:${sec}:f>`;
     },
@@ -189,7 +202,7 @@ export const ReminderCommand: RegisterableCommand = {
         fullDescription: "Queues a reminder. Requires you to include one of the following clauses: \n\
 - `at` for specific time. e.g.: x at 5 pm. \n\
 - `in` for relative time. e.g.: x in 5 hours. \n\
-- `cron` for recurring time. e.g.: x cron `0 0 0 0 1`. (backticks are optional but useful if using \\*) \n\
+- `cron` for recurring time. e.g.: x cron `0 5 * * *`. (backticks are optional but useful if using \\*) \n\
 for reference, here is the cron parameters: \n\
 ```\
 *    *    *    *    *    * \n\
@@ -203,7 +216,7 @@ for reference, here is the cron parameters: \n\
 └───────────────────────── second (0 - 59, optional).\
         ```\n\
         refer to <https://crontab.guru/> to find the right combination.",
-        usage: "`\`<message> at <exact time>\` or \`<message> in <relative time>\` or \`<message> cron <recurring time>\``",
+        usage: "`<message> at <exact time>` or `<message> in <relative time>` or `<message> cron <cron format>`",
         aliases: ["rmb"],
         argsRequired: true,
     },
