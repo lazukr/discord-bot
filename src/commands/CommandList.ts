@@ -1,4 +1,5 @@
 import { ChooseCommand } from "./generic/ChooseCommand.js";
+import { CronCheckCommand } from "./generic/CronCommand.js";
 import { DadJokeCommand } from "./generic/DadJokeCommand.js";
 import { ReminderCommand } from "./generic/ReminderCommand.js";
 import { NovaCharCommand } from "./novaro/NovaCharCommand.js";
@@ -11,4 +12,5 @@ export const CommandList: RegisterableCommand[] = [
     NovaCharCommand,
     DadJokeCommand,
     ReminderCommand,
+    CronCheckCommand,
 ];

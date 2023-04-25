@@ -214,8 +214,9 @@ for reference, here is the cron parameters: \n\
 │    │    └─────────────── hour (0 - 23) \n\
 │    └──────────────────── minute (0 - 59) \n\
 └───────────────────────── second (0 - 59, optional).\
-        ```\n\
-        refer to <https://crontab.guru/> to find the right combination.",
+```\
+refer to <https://crontab.guru/> to find the right combination.\n\n\
+If you need to check the current cron combination, you can also use `croncheck` command.",
         usage: "`<message> at <exact time>` or `<message> in <relative time>` or `<message> cron <cron format>`",
         aliases: ["rmb"],
         argsRequired: true,
