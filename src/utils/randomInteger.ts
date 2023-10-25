@@ -1,7 +1,11 @@
 export interface RandomIntegerGenerator {
-    (min: number, max: number, rand?: () => number): number;
+	(min: number, max: number, rand?: () => number): number;
 }
 
-export const randomInteger: RandomIntegerGenerator = (min, max, rand = Math.random) => {
-    return Math.floor(rand() * (max - min) + min);
+export const randomInteger: RandomIntegerGenerator = (
+	min,
+	max,
+	rand = Math.random
+) => {
+	return Math.floor(rand() * (max - min + 1) + min);
 };
