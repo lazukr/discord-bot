@@ -20,7 +20,7 @@ export const choose = (
 		.split(",")
 		.map((x) => x.trim());
 
-	const rand = randomNumGenerator(0, args.length - 1);
+	const rand = randomNumGenerator(0, list.length - 1);
 	return list[rand];
 };
 
