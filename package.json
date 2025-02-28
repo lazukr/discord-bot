@@ -29,7 +29,7 @@
     "typescript": "^4.9.3"
   },
   "scripts": {
-    "dev": "ts-node-esm ./src/Index.ts",
+    "dev": "node --loader ts-node/esm ./src/Index.ts",
     "start": "node ./dist/src/Index.js",
     "test": "jest",
     "build": "rm -rf ./dist && tsc --build"
