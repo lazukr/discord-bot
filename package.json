@@ -30,7 +30,7 @@
   },
   "scripts": {
     "dev": "node --loader ts-node/esm ./src/Index.ts",
-    "start": "node ./dist/src/Index.js",
+    "start": "NODE_ENV=production node ./dist/src/Index.js",
     "test": "jest",
     "build": "rm -rf ./dist && tsc --build"
   }
